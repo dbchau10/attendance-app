@@ -7,7 +7,13 @@ export default function ClassSelector({ classId, onClassChange, onStartSession }
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        getClasses().then(setClasses).catch(() => setClasses([])).finally(() => setLoading(false))
+        getClasses().then((data) => {
+            console.log('API response', data)
+            setClasses(data)
+        }).catch((err) => {
+            console.log('API error', err)
+            setClasses([])
+        }).finally(() => setLoading(false))
     }, [])
     if (loading) {
         return (
