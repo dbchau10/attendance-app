@@ -39,7 +39,7 @@ function App() {
     if (!classId) return
     showToast('Đang tạo buổi điểm danh...', 'info')
     try {
-      const r = await api.startSessions(classId)
+      const r = await api.startSession(classId)
       showToast(r.message, r.existing ? 'warning' : 'success')
       refreshStatus(classId)
     } catch (e) {
@@ -48,22 +48,29 @@ function App() {
   }
 
   const doMark = useCallback(async (studentId) => {
+    alert('doMark' + studentId)
     if (busyRef.current || !classId) return
     busyRef.current = true
     setBusy(true)
 
+    var timer = setTimeout(function () {
+      busyRef.current = false;
+      setBusy(false)
+    }, 5000)
     try {
       const r = await api.markAttendance(classId, studentId)
+      alert('KQ', JSON.stringify(r))
       setResults((prev) => [r, ...prev].slice(0, 15))
       refreshStatus(classId)
     } catch (e) {
       setResults((prev) => [{ success: false, message: 'Lỗi: ' + e.message }, ...prev].slice(0, 15))
+      alert('error: ' + e.message)
+    } finally {
+      clearTimeout(timer)
+      busyRef.current = false
+      setBusy(false)
     }
 
-    setTimeout(() => {
-      busyRef.current = false;
-      setBusy(false)
-    }, 1200)
   }, [classId, refreshStatus])
 
 

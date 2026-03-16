@@ -51,12 +51,11 @@ async function callApi(action, params) {
 }
 
 export const getClasses = () => callApi("getClasses");
-export const getStudents = (fieldId) => callApi("getStudents", { fieldId });
-export const startSessions = (fieldId) => callApi("startSessions", { fieldId });
-export const markAttendance = (fieldId, studentId) =>
-  callApi("markAttendance", { fieldId, studentId });
-export const getAttendanceStatus = (fieldId) =>
-  callApi("getAttendanceStatus", { fieldId });
+export const getStudents = (fileId) => callApi("getStudents", { fileId });
+export const startSession = (fileId) => callApi("startSession", { fileId });
+export const markAttendance = (fileId, studentId) =>
+  callApi("markAttendance", { fileId, studentId });
+export const getAttendanceStatus = (fileId) => callApi("getStatus", { fileId });
 
 // export async function getClasses(){
 //     var res = await fetch('/gas?action=getClasses')
