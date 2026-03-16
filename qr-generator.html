@@ -1,299 +1,298 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tạo mã QR học viên</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo mã QR học viên</title>
 
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f0f2f5;
-  color: #1a1a2e;
-  min-height: 100vh;
-}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
 
-.header {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: white;
-  padding: 20px;
-  text-align: center;
-}
+    .header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
 
-.header h1 { font-size: 20px; font-weight: 700; }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
 
-.header p {
-  font-size: 13px;
-  opacity: .8;
-  margin-top: 6px;
-}
+    .header p {
+      font-size: 13px;
+      opacity: .8;
+      margin-top: 6px;
+    }
 
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
 
-.card {
-  background: white;
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-}
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+    }
 
-.card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  margin-bottom: 14px;
-}
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 14px;
+    }
 
-textarea {
-  width: 100%;
-  min-height: 180px;
-  padding: 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: "Courier New", monospace;
-  line-height: 1.8;
-  resize: vertical;
-}
+    select,
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
 
-textarea:focus {
-  outline: none;
-  border-color: #1a1a2e;
-}
+    select {
+      border: 2px solid #5e7eb7;
+      margin-bottom: 10px;
+    }
 
-.hint {
-  font-size: 13px;
-  color: #999;
-  margin-top: 8px;
-  line-height: 1.6;
-}
+    .btn {
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
 
-.btn-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+    .btn-dark {
+      background: #1a1a2e;
+      color: white;
+    }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 28px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform .1s;
-  margin-top: 14px;
-}
+    .btn-green {
+      background: #059669;
+      color: white;
+    }
 
-.btn:active { transform: scale(.97); }
+    #status {
+      text-align: center;
+      color: #666;
+      margin: 10px 0;
+    }
 
-.btn-dark { background: #1a1a2e; color: white; }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
 
-.btn-green { background: #059669; color: white; }
+    .qr-card {
+      border: 2px solid #5e7eb7;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
 
-.qr-grid {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 16px;
-}
+    .qr-card img {
+      display: block;
+      margin: auto;
+    }
 
-.qr-card {
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 16px;
-  text-align: center;
-  break-inside: avoid;
-}
+    .qr-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-.qr-card img {
-  display: block;
-  margin: 0 auto 10px;
-  image-rendering: pixelated;
-}
-
-.qr-name {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.qr-id {
-  font-size: 12px;
-  color: #999;
-  margin-top: 2px;
-}
-
-.info {
-  background: #f6f6ff;
-  border-left: 4px solid #3b82f6;
-  padding: 14px 16px;
-  border-radius: 0 10px 10px 0;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-@media print {
-  body { background: white; }
-
-  .header,.input-section,.btn,.info,.hint { display:none !important; }
-
-  .container { max-width:100%; padding:0; }
-
-  .card { box-shadow:none; border:none; padding:8px; }
-
-  .qr-grid { grid-template-columns: repeat(4,1fr); gap:8px; }
-
-  .qr-card { border:1px solid #ddd; padding:10px; }
-
-  .qr-card img { width:120px !important; height:120px !important; }
-}
-
-@media (max-width:600px){
-  .qr-grid { grid-template-columns: repeat(2,1fr); }
-}
-</style>
+    .qr-id {
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="header">
-<h1>Tạo mã QR học viên</h1>
-<p>Nhập danh sách → Tạo QR → In ra giấy → Phát cho học viên</p>
-</div>
+  <div class="header">
+    <h1>Tạo mã QR học viên</h1>
+    <p>Chọn lớp → Tạo QR → In ra giấy → Phát cho học viên</p>
+  </div>
 
-<div class="container">
+  <div class="container">
 
-<div class="card input-section">
-<div class="card-title">Nhập danh sách học viên</div>
+    <div class="card">
 
-<textarea id="student-input" placeholder="Nhập mỗi dòng 1 học viên theo định dạng:
+      <div class="card-title">Chọn lớp</div>
 
-Mã số, Tên thánh, Họ tên
+      <select id="classSelect">
+        <option value="">— Đang tải danh sách lớp…</option>
+      </select>
 
-Ví dụ:
-1, Phêrô, Nguyễn Văn A
-2, Maria, Trần Thị B
-3, Giuse, Lê Văn C
-4, Anna, Phạm Thị D"></textarea>
+      <button id="btnGenerate" class="btn btn-dark" disabled onclick="generateQR()">
+        Tạo mã QR
+      </button>
 
-<div class="hint">
-Mỗi dòng: <b>Mã số, Tên thánh, Họ tên</b><br>
-Nếu không có tên thánh: <b>Mã số, , Họ tên</b> hoặc <b>Mã số, Họ tên</b>
-</div>
+      <button id="btnPrint" class="btn btn-green" style="display:none" onclick="window.print()">
+        In mã QR
+      </button>
 
-<div class="btn-row">
-<button class="btn btn-dark" onclick="generateQR()">Tạo mã QR</button>
-<button class="btn btn-green" onclick="window.print()">In mã QR</button>
-</div>
+    </div>
 
-</div>
+    <p id="status"></p>
 
-<div class="card" id="info-card" style="display:none">
-<div class="info">
-In trang này → cắt từng ô → phát cho học viên.<br>
-Mỗi học viên giữ 1 mã QR để quét điểm danh mỗi buổi.
-</div>
-</div>
+    <div class="card" id="infoCard" style="display:none">
+      QR mới chứa mã lớp + mã số → quét là điểm danh,
+      <strong>không cần chọn lớp</strong> trên app.
+    </div>
 
-<div class="card" id="output-card" style="display:none">
+    <div class="card" id="outputCard" style="display:none">
+      <div class="card-title" id="outputTitle">Mã QR</div>
+      <div id="qrGrid" class="qr-grid"></div>
+    </div>
 
-<div class="card-title" id="output-title">Mã QR</div>
+  </div>
 
-<div class="qr-grid" id="qr-grid"></div>
+  <script>
 
-</div>
+    var API = "https://script.google.com/macros/s/AKfycbyX9tmXzZ1ck8wWA_PINZZB-3VXr3c1JFQHKm4mVMkw10_OYAab38hmH64mOernQDie/exec"
 
-</div>
+    var classSelect = document.getElementById("classSelect")
+    var btnGenerate = document.getElementById("btnGenerate")
 
-<script>
+    fetch(API + "?action=getClasses")
+      .then(r => r.json())
+      .then(classes => {
 
-function parseStudents(text){
+        classSelect.innerHTML = '<option value="">— Chọn lớp —</option>'
 
-return text.trim().split('\n')
-.map(function(line){ return line.trim(); })
-.filter(function(line){ return line.length>0; })
-.map(function(line){
+        classes.forEach(c => {
 
-var parts=line.split(',').map(function(p){return p.trim();});
+          var opt = document.createElement("option")
+          opt.value = c.id
+          opt.textContent = c.name
 
-if(parts.length>=3){
-return {id:parts[0],saintName:parts[1],fullName:parts[2]};
-}
+          classSelect.appendChild(opt)
 
-if(parts.length==2){
-return {id:parts[0],saintName:'',fullName:parts[1]};
-}
+        })
 
-return {id:parts[0],saintName:'',fullName:''};
+      })
+      .catch(() => {
 
-});
+        classSelect.innerHTML = '<option value="">Lỗi tải danh sách lớp</option>'
 
-}
+      })
 
-function generateQR(){
+    classSelect.addEventListener("change", function () {
 
-var text=document.getElementById('student-input').value;
+      btnGenerate.disabled = !this.value
 
-var students=parseStudents(text);
+      document.getElementById("btnPrint").style.display = "none"
+      document.getElementById("qrGrid").innerHTML = ""
 
-if(students.length===0){
-alert('Vui lòng nhập danh sách học viên.');
-return;
-}
+      document.getElementById("outputCard").style.display = "none"
+      document.getElementById("infoCard").style.display = "none"
 
-var grid=document.getElementById('qr-grid');
+      document.getElementById("status").textContent = ""
 
-grid.innerHTML='';
+    })
 
-students.forEach(function(s){
+    function generateQR() {
 
-var card=document.createElement('div');
-card.className='qr-card';
+      var fileId = classSelect.value
+      if (!fileId) return
 
-var img=document.createElement('img');
+      btnGenerate.disabled = true
 
-img.width=150;
-img.height=150;
+      document.getElementById("status").textContent = "Đang tải danh sách học viên..."
+      document.getElementById("qrGrid").innerHTML = ""
+      document.getElementById("btnPrint").style.display = "none"
 
-img.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+encodeURIComponent(s.id);
+      fetch(API + "?action=getStudents&fileId=" + fileId)
 
-card.appendChild(img);
+        .then(r => r.json())
 
-var name=document.createElement('div');
-name.className='qr-name';
-name.textContent=(s.saintName? s.saintName+" ":"")+s.fullName;
+        .then(students => {
 
-card.appendChild(name);
+          if (!students || students.length === 0) {
 
-var id=document.createElement('div');
-id.className='qr-id';
-id.textContent="Mã số: "+s.id;
+            document.getElementById("status").textContent = "Không có học viên nào."
+            btnGenerate.disabled = false
+            return
 
-card.appendChild(id);
+          }
 
-grid.appendChild(card);
+          document.getElementById("status").textContent = "Đang tạo " + students.length + " mã QR..."
 
-});
+          var grid = document.getElementById("qrGrid")
 
-document.getElementById('info-card').style.display='block';
-document.getElementById('output-card').style.display='block';
-document.getElementById('output-title').textContent=students.length+" học viên";
+          students.forEach(s => {
 
-}
+            var qrContent = fileId + ":" + s.id
 
-</script>
+            var card = document.createElement("div")
+            card.className = "qr-card"
+
+            var img = document.createElement("img")
+            img.width = 150
+            img.height = 150
+
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrContent)
+
+            card.appendChild(img)
+
+            var name = document.createElement("div")
+            name.className = "qr-name"
+            name.textContent = (s.saintName ? s.saintName + " " : "") + s.fullName
+
+            card.appendChild(name)
+
+            var id = document.createElement("div")
+            id.className = "qr-id"
+            id.textContent = "Mã số: " + s.id
+
+            card.appendChild(id)
+
+            grid.appendChild(card)
+
+          })
+
+          document.getElementById("status").textContent = ""
+          document.getElementById("outputTitle").textContent = students.length + " học viên"
+
+          document.getElementById("outputCard").style.display = "block"
+          document.getElementById("infoCard").style.display = "block"
+
+          document.getElementById("btnPrint").style.display = "block"
+
+          btnGenerate.disabled = false
+
+        })
+
+        .catch(err => {
+
+          document.getElementById("status").textContent = "Lỗi: " + err.message
+          btnGenerate.disabled = false
+
+        })
+
+    }
+
+  </script>
 
 </body>
+
 </html>
