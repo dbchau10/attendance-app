@@ -32,38 +32,52 @@
 //   return JSON.parse(text);
 // }
 
+var DEV = window.location.hostname === "localhost";
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbyX9tmXzZ1ck8wWA_PINZZB-3VXr3c1JFQHKm4mVMkw10_OYAab38hmH64mOernQDie/exec";
+function buildUrl(action, params) {
+  var base = DEV ? "/gas" : GAS_URL;
+  var query = "?action=" + action;
+  for (var key in params) {
+    query += "&" + key + "=" + encodeURIComponent(params[key]);
+  }
 
-// export const getClasses = () => callApi("getClasses");
-// export const getStudents = (fieldId) => callApi("getStudents", { fieldId });
-// export const startSessions = (fieldId) => callApi("startSessions", { fieldId });
-// export const markAttendance = (fieldId, studentId) =>
-//   callApi("markAttendance", { fieldId, studentId });
-// export const getAttendanceStatus = (fieldId) =>
-//   callApi("getAttendanceStatus", { fieldId });
-
-export async function getClasses(){
-    var res = await fetch('/gas?action=getClasses')
-    return res.json()
+  return base + query;
 }
 
-export async function getStudents(fileId){
-    var res = await fetch('/gas?action=getStudents&fileId=' + fileId)
-    return res.json()
+async function callApi(action, params) {
+  var res = await fetch(buildUrl(action, params || {}));
+  return res.json();
 }
 
+export const getClasses = () => callApi("getClasses");
+export const getStudents = (fieldId) => callApi("getStudents", { fieldId });
+export const startSessions = (fieldId) => callApi("startSessions", { fieldId });
+export const markAttendance = (fieldId, studentId) =>
+  callApi("markAttendance", { fieldId, studentId });
+export const getAttendanceStatus = (fieldId) =>
+  callApi("getAttendanceStatus", { fieldId });
 
-export async function startSession(fileId){
-    var res = await fetch('/gas?action=startSession&fileId=' + fileId)
-    return res.json()
-}
-export async function markAttendance(fileId, studentId){
-    var res = await fetch('/gas?action=markAttendance&fileId=' + fileId + '&studentId='+ studentId)
-    return res.json()
-}
+// export async function getClasses(){
+//     var res = await fetch('/gas?action=getClasses')
+//     return res.json()
+// }
 
-export async function getAttendanceStatus(fileId){
-    var res = await fetch('/gas?action=getStatus&fileId=' + fileId)
-    return res.json()
-}
+// export async function getStudents(fileId){
+//     var res = await fetch('/gas?action=getStudents&fileId=' + fileId)
+//     return res.json()
+// }
 
+// export async function startSession(fileId){
+//     var res = await fetch('/gas?action=startSession&fileId=' + fileId)
+//     return res.json()
+// }
+// export async function markAttendance(fileId, studentId){
+//     var res = await fetch('/gas?action=markAttendance&fileId=' + fileId + '&studentId='+ studentId)
+//     return res.json()
+// }
 
+// export async function getAttendanceStatus(fileId){
+//     var res = await fetch('/gas?action=getStatus&fileId=' + fileId)
+//     return res.json()
+// }
