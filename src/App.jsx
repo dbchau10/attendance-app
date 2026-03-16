@@ -47,8 +47,7 @@ function App() {
     }
   }
 
-  const doMark = useCallback(async (studentId) => {
-    alert('doMark' + studentId)
+  const doMark = useCallback(async (raw) => {
     if (busyRef.current || !classId) return
     busyRef.current = true
     setBusy(true)
@@ -58,13 +57,39 @@ function App() {
       setBusy(false)
     }, 5000)
     try {
-      const r = await api.markAttendance(classId, studentId)
-      alert('KQ', JSON.stringify(r))
-      setResults((prev) => [r, ...prev].slice(0, 15))
-      refreshStatus(classId)
+      var r
+
+      if (raw.indexOf(':') !== -1) {
+        var parts = raw.split(':')
+        r = await api.smartMark(parts[0], parts[1])
+
+        if (r.className) {
+          r.message = '[' + r.className + '] ' + r.message
+        }
+      } else {
+        if (!classId) {
+          r = {
+            success: false,
+            message: 'Chọn lớp trước khi quét mã cũ (không có classId)'
+          }
+        } else {
+          r = await api.markAttendance(classId, raw)
+        }
+      }
+
+      setResults(function (prev) {
+        return [r].concat(prev).slice(0, 20)
+      })
+
+      if (classId) refreshStatus(classId)
+
     } catch (e) {
-      setResults((prev) => [{ success: false, message: 'Lỗi: ' + e.message }, ...prev].slice(0, 15))
-      alert('error: ' + e.message)
+      setResults(function (prev) {
+        return [{
+          success: false,
+          message: 'Lỗi: ' + e.message
+        }].concat(prev).slice(0, 20)
+      })
     } finally {
       clearTimeout(timer)
       busyRef.current = false
@@ -79,27 +104,41 @@ function App() {
       <Header />
 
       <div className="max-w-md mx-auto p-4 space-y-4">
-        <ClassSelector classId={classId} onClassChange={handleClassChange} onStartSession={handleStartSession} />
 
-        {classId && (
-          <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Quét mã QR
-            </p>
-            <Scanner onScan={doMark} disabled={busy} />
-            <Divider>hoặc nhập mã số</Divider>
-            <ManualInput onSubmit={doMark} disabled={busy} />
-          </div>
-        )}
+        {/* Scanner luôn hiện — quét QR mới không cần chọn lớp */}
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-4">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            Quét mã QR
+          </p>
+
+          <Scanner onScan={doMark} />
+        </div>
 
         <ScanResults results={results} />
-        <AttendanceStats status={status} />
-      </div>
 
-      <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast((t) => ({ ...t, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity={toast.severity} variant="filled" sx={{ width: '100%' }}>{toast.msg}</Alert>
-      </Snackbar>
+        {/* Chọn lớp — chỉ cần khi dùng QR cũ hoặc nhập tay */}
+        <details className="bg-white rounded-xl shadow-sm">
+          <summary className="p-5 cursor-pointer text-sm font-semibold text-gray-500">
+            Nhập mã số tay / Xem danh sách lớp
+          </summary>
+
+          <div className="px-5 pb-5 space-y-4">
+            <ClassSelector
+              classId={classId}
+              onClassChange={handleClassChange}
+              onStartSession={handleStartSession}
+            />
+
+            {classId && (
+              <>
+                <ManualInput onSubmit={doMark} disabled={busy} />
+                <AttendanceStats status={status} />
+              </>
+            )}
+          </div>
+        </details>
+
+      </div>
     </div>
   )
 }

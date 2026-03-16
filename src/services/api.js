@@ -57,6 +57,9 @@ export const markAttendance = (fileId, studentId) =>
   callApi("markAttendance", { fileId, studentId });
 export const getAttendanceStatus = (fileId) => callApi("getStatus", { fileId });
 
+export const smartMark = (classId, studentCode) =>
+  callApi("smartMark", { classId, studentCode });
+
 // export async function getClasses(){
 //     var res = await fetch('/gas?action=getClasses')
 //     return res.json()
