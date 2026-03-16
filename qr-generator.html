@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tạo mã QR học viên</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.header h1 { font-size: 20px; font-weight: 700; }
+
+.header p {
+  font-size: 13px;
+  opacity: .8;
+  margin-top: 6px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 14px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: "Courier New", monospace;
+  line-height: 1.8;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #1a1a2e;
+}
+
+.hint {
+  font-size: 13px;
+  color: #999;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .1s;
+  margin-top: 14px;
+}
+
+.btn:active { transform: scale(.97); }
+
+.btn-dark { background: #1a1a2e; color: white; }
+
+.btn-green { background: #059669; color: white; }
+
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+}
+
+.qr-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  break-inside: avoid;
+}
+
+.qr-card img {
+  display: block;
+  margin: 0 auto 10px;
+  image-rendering: pixelated;
+}
+
+.qr-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.qr-id {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.info {
+  background: #f6f6ff;
+  border-left: 4px solid #3b82f6;
+  padding: 14px 16px;
+  border-radius: 0 10px 10px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media print {
+  body { background: white; }
+
+  .header,.input-section,.btn,.info,.hint { display:none !important; }
+
+  .container { max-width:100%; padding:0; }
+
+  .card { box-shadow:none; border:none; padding:8px; }
+
+  .qr-grid { grid-template-columns: repeat(4,1fr); gap:8px; }
+
+  .qr-card { border:1px solid #ddd; padding:10px; }
+
+  .qr-card img { width:120px !important; height:120px !important; }
+}
+
+@media (max-width:600px){
+  .qr-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>Tạo mã QR học viên</h1>
+<p>Nhập danh sách → Tạo QR → In ra giấy → Phát cho học viên</p>
+</div>
+
+<div class="container">
+
+<div class="card input-section">
+<div class="card-title">Nhập danh sách học viên</div>
+
+<textarea id="student-input" placeholder="Nhập mỗi dòng 1 học viên theo định dạng:
+
+Mã số, Tên thánh, Họ tên
+
+Ví dụ:
+1, Phêrô, Nguyễn Văn A
+2, Maria, Trần Thị B
+3, Giuse, Lê Văn C
+4, Anna, Phạm Thị D"></textarea>
+
+<div class="hint">
+Mỗi dòng: <b>Mã số, Tên thánh, Họ tên</b><br>
+Nếu không có tên thánh: <b>Mã số, , Họ tên</b> hoặc <b>Mã số, Họ tên</b>
+</div>
+
+<div class="btn-row">
+<button class="btn btn-dark" onclick="generateQR()">Tạo mã QR</button>
+<button class="btn btn-green" onclick="window.print()">In mã QR</button>
+</div>
+
+</div>
+
+<div class="card" id="info-card" style="display:none">
+<div class="info">
+In trang này → cắt từng ô → phát cho học viên.<br>
+Mỗi học viên giữ 1 mã QR để quét điểm danh mỗi buổi.
+</div>
+</div>
+
+<div class="card" id="output-card" style="display:none">
+
+<div class="card-title" id="output-title">Mã QR</div>
+
+<div class="qr-grid" id="qr-grid"></div>
+
+</div>
+
+</div>
+
+<script>
+
+function parseStudents(text){
+
+return text.trim().split('\n')
+.map(function(line){ return line.trim(); })
+.filter(function(line){ return line.length>0; })
+.map(function(line){
+
+var parts=line.split(',').map(function(p){return p.trim();});
+
+if(parts.length>=3){
+return {id:parts[0],saintName:parts[1],fullName:parts[2]};
+}
+
+if(parts.length==2){
+return {id:parts[0],saintName:'',fullName:parts[1]};
+}
+
+return {id:parts[0],saintName:'',fullName:''};
+
+});
+
+}
+
+function generateQR(){
+
+var text=document.getElementById('student-input').value;
+
+var students=parseStudents(text);
+
+if(students.length===0){
+alert('Vui lòng nhập danh sách học viên.');
+return;
+}
+
+var grid=document.getElementById('qr-grid');
+
+grid.innerHTML='';
+
+students.forEach(function(s){
+
+var card=document.createElement('div');
+card.className='qr-card';
+
+var img=document.createElement('img');
+
+img.width=150;
+img.height=150;
+
+img.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+encodeURIComponent(s.id);
+
+card.appendChild(img);
+
+var name=document.createElement('div');
+name.className='qr-name';
+name.textContent=(s.saintName? s.saintName+" ":"")+s.fullName;
+
+card.appendChild(name);
+
+var id=document.createElement('div');
+id.className='qr-id';
+id.textContent="Mã số: "+s.id;
+
+card.appendChild(id);
+
+grid.appendChild(card);
+
+});
+
+document.getElementById('info-card').style.display='block';
+document.getElementById('output-card').style.display='block';
+document.getElementById('output-title').textContent=students.length+" học viên";
+
+}
+
+</script>
+
+</body>
+</html>
