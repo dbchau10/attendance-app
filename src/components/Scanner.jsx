@@ -9,6 +9,7 @@ export default function Scanner({ onScan }) {
     const videoRef = useRef(null)
     const streamRef = useRef(null)
     const timerRef = useRef(null)
+    const audioRef = useRef(null);
 
     // const scannerRef = useRef(null)
     const lastScanRef = useRef({ text: '', time: 0 })
@@ -86,7 +87,20 @@ export default function Scanner({ onScan }) {
     //     }
     // }, [])
 
-
+    function beep() {
+        try {
+            if (!audioRef.current) return;
+            var ctx = audioRef.current
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.connect(gain)
+            gain.connect(ctx.destination)
+            osc.frequency.value = 1800
+            gain.gain.value = 0.5
+            osc.start()
+            osc.stop(ctx.currentTime + 0.15)
+        } catch (e) { }
+    }
     async function startCamera() {
         setError('')
         if (!('BarcodeDetector' in window)) {
@@ -121,6 +135,7 @@ export default function Scanner({ onScan }) {
             streamRef.current = stream
             videoRef.current.srcObject = stream
             await videoRef.current.play()
+            audioRef.current = new window.AudioContext()
             setStarted(true)
 
 
@@ -135,6 +150,7 @@ export default function Scanner({ onScan }) {
                         var now = Date.now()
                         if (text === lastScanRef.current.text && now - lastScanRef.current.time < 3000) return
                         lastScanRef.current = { text: text, time: now }
+                        beep();
                         onScan(text)
                     }
                 } catch (e) { }
@@ -157,6 +173,7 @@ export default function Scanner({ onScan }) {
             streamRef.current = null
         }
         if (videoRef.current) videoRef.current.srcObject = null
+        if (audioRef.current) { audioRef.current.close(); audioRef.current = null; }
         setStarted(false)
     }
 
